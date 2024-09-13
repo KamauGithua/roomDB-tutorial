@@ -5,11 +5,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -68,6 +75,12 @@ class MainActivity : ComponentActivity() {
                         name,
                         body
                     )
+                    var noteList by remember {
+                        mutableStateOf(listOf<Note>())
+                    }
+                    viewModel.getNotes().observe(this){
+                        noteList = it
+                    }
                     Column(Modifier.padding(12.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Button(onClick = {
@@ -81,6 +94,19 @@ class MainActivity : ComponentActivity() {
                         TextField(value = body, onValueChange = {body = it}, placeholder = {
                             Text(text = "body")
                         })
+
+                        LazyColumn {
+                            items(noteList){ note->
+                                Column(Modifier.clickable {
+                                    viewModel.deleteNote(note)
+                                }) {
+                                    Text(text = "Name: ${note.noteName}")
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Text(text = "Body: ${note.noteBody}")
+                                    Divider(Modifier.fillMaxWidth().padding(6.dp))
+                                }
+                            }
+                        }
                     }
                 }
             }
